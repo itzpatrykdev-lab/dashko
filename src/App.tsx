@@ -211,6 +211,7 @@ function App() {
                       loading={vehiclesLoading}
                       onVehicleChanged={handleVehicleChanged}
                       onAddVehicle={() => setShowAddVehicle(true)}
+                      activeVehicleId={activeVehicleId}
                     />
                   )}
 

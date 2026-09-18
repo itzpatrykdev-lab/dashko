@@ -1,4 +1,10 @@
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import {
+  CarFront,
+  ClipboardList,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import type { Vehicle } from "../../../types/vehicle";
 
 type VehicleCardProps = {
@@ -22,16 +28,10 @@ function formatVehicleName(vehicle: Vehicle) {
     .join(" ");
 }
 
-function maskVin(vin: string | null) {
-  if (!vin) {
-    return "VIN unavailable";
-  }
-
-  if (vin.length <= 4) {
-    return `VIN ${vin}`;
-  }
-
-  return `VIN ••••${vin.slice(-4)}`;
+function formatPlate(vehicle: Vehicle) {
+  return [vehicle.license_plate, vehicle.plate_state]
+    .filter(Boolean)
+    .join(" · ");
 }
 
 export default function VehicleCard({
@@ -42,12 +42,10 @@ export default function VehicleCard({
 }: VehicleCardProps) {
   const vehicleName = formatVehicleName(vehicle);
   const vehicleLabel = vehicle.nickname || vehicleName || "Unnamed vehicle";
-  const plate = [vehicle.license_plate, vehicle.plate_state]
-    .filter(Boolean)
-    .join(" · ");
+  const plate = formatPlate(vehicle);
 
   return (
-    <article className="group relative overflow-hidden rounded-xl border border-border bg-surface p-5 transition-colors hover:border-accent/50">
+    <article className="group rounded-xl border border-border bg-surface p-5 shadow-sm transition duration-200 hover:border-accent/40 hover:bg-surface/90">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -56,61 +54,63 @@ export default function VehicleCard({
             </p>
 
             {isActive && (
-              <span className="rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-accent">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-emerald-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                 Active
               </span>
             )}
           </div>
 
-          <h2 className="mt-2 truncate text-lg font-bold tracking-tight text-text">
+          <h2 className="mt-2 max-w-md text-lg font-bold leading-snug tracking-tight text-text">
             {vehicleName || "Vehicle details unavailable"}
           </h2>
         </div>
+      </div>
 
+      <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-text-muted">
+        <div className="inline-flex items-center gap-2">
+          <CarFront className="h-4 w-4 text-text-muted" />
+          <span className="font-medium text-text">
+            {formatMileage(vehicle.current_mileage)}
+          </span>
+        </div>
+
+        <span
+          aria-hidden="true"
+          className="hidden h-4 w-px bg-border sm:block"
+        />
+
+        <div className="inline-flex items-center gap-2">
+          <ClipboardList className="h-4 w-4 text-text-muted" />
+          <span className="font-medium text-text">
+            {plate || "Plate not recorded"}
+          </span>
+        </div>
+      </div>
+
+      <p className="mt-4 text-sm text-text-muted">
+        Service history available from your garage.
+      </p>
+
+      <div className="mt-5 flex items-center justify-between gap-3">
         <button
           type="button"
           onClick={() => onEdit(vehicle)}
-          aria-label={`Edit ${vehicleLabel}`}
-          title={`Edit ${vehicleLabel}`}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border text-text-muted transition hover:border-accent hover:text-accent"
+          className="inline-flex items-center gap-2 rounded-md border border-accent px-3.5 py-2 text-xs font-bold text-text transition hover:bg-accent hover:text-white"
         >
-          <Pencil className="h-4 w-4" />
+          <Pencil className="h-3.5 w-3.5" />
+          View details
         </button>
-      </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-3 border-y border-border py-4">
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-text-muted">
-            Mileage
-          </p>
-          <p className="mt-1 text-sm font-semibold text-text">
-            {formatMileage(vehicle.current_mileage)}
-          </p>
-        </div>
-
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-text-muted">
-            Plate
-          </p>
-          <p className="mt-1 truncate text-sm font-semibold text-text">
-            {plate || "Not recorded"}
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-4 flex items-center justify-between gap-3">
-        <p className="truncate text-xs text-text-muted">
-          {maskVin(vehicle.vin)}
-        </p>
-
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => onEdit(vehicle)}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-2 text-xs font-bold text-text transition hover:border-accent hover:text-accent"
+            aria-label={`Edit ${vehicleLabel}`}
+            title={`Edit ${vehicleLabel}`}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-text-muted transition hover:border-accent hover:text-accent"
           >
-            <Pencil className="h-3.5 w-3.5" />
-            Edit
+            <MoreHorizontal className="h-4 w-4" />
           </button>
 
           <button
@@ -118,17 +118,12 @@ export default function VehicleCard({
             onClick={() => onDelete(vehicle.id)}
             aria-label={`Delete ${vehicleLabel}`}
             title={`Delete ${vehicleLabel}`}
-            className="flex h-8 w-8 items-center justify-center rounded-md border border-danger/60 text-danger transition hover:bg-danger hover:text-white"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-danger/50 text-danger transition hover:bg-danger hover:text-white"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
-
-      <MoreHorizontal
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-6 -bottom-6 h-24 w-24 text-accent/[0.035]"
-      />
     </article>
   );
 }

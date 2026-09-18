@@ -9,6 +9,7 @@ type VehicleListProps = {
   loading: boolean;
   onVehicleChanged: () => void;
   onAddVehicle: () => void;
+  activeVehicleId: string;
 };
 
 type VehicleFilter = "all" | "attention";
@@ -37,6 +38,7 @@ export default function VehicleList({
   loading,
   onVehicleChanged,
   onAddVehicle,
+  activeVehicleId,
 }: VehicleListProps) {
   const [errorMsg, setErrorMsg] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -165,29 +167,20 @@ export default function VehicleList({
 
   return (
     <section className="space-y-6">
-      <header className="flex flex-col gap-4 border-b border-border pb-5 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
-            Garage
-          </p>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-text">
-            Your Vehicles
-          </h1>
-          <p className="mt-1 text-sm text-text-muted">
-            {vehicles.length} {vehicles.length === 1 ? "vehicle" : "vehicles"}{" "}
-            tracked
-            {" · "}Manage your complete garage.
-          </p>
-        </div>
+      <header className="border-b border-border pb-5">
+        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
+          Garage
+        </p>
 
-        <button
-          type="button"
-          onClick={onAddVehicle}
-          className="inline-flex w-fit items-center gap-2 rounded-md bg-accent px-4 py-2.5 text-sm font-bold text-white transition hover:opacity-90"
-        >
-          <Plus className="h-4 w-4" />
-          Add vehicle
-        </button>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-text sm:text-4xl">
+          Your Vehicles
+        </h1>
+
+        <p className="mt-1 text-sm text-text-muted">
+          {vehicles.length} {vehicles.length === 1 ? "vehicle" : "vehicles"}{" "}
+          tracked
+          {" · "}Manage your complete garage.
+        </p>
       </header>
 
       {errorMsg && (
@@ -267,6 +260,7 @@ export default function VehicleList({
               <VehicleCard
                 key={vehicle.id}
                 vehicle={vehicle}
+                isActive={vehicle.id === activeVehicleId}
                 onEdit={startEdit}
                 onDelete={handleDelete}
               />
