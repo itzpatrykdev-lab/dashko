@@ -1,27 +1,42 @@
+export type DashboardPage = "dashboard" | "vehicles" | "service-history";
+
 type NavItem = {
+  id:
+    | DashboardPage
+    | "fuel-log"
+    | "expenses"
+    | "reminders"
+    | "reports"
+    | "settings";
   label: string;
   icon: string;
-  active?: boolean;
   disabled?: boolean;
 };
 
 type SidebarProps = {
   collapsed: boolean;
   onToggle: () => void;
+  activePage: DashboardPage;
+  onNavigate: (page: DashboardPage) => void;
 };
 
 const navItems: NavItem[] = [
-  { label: "Dashboard", icon: "⌂", active: true },
-  { label: "Vehicles", icon: "▣" },
-  { label: "Service History", icon: "⚒" },
-  { label: "Fuel Log", icon: "⛽", disabled: true },
-  { label: "Expenses", icon: "$", disabled: true },
-  { label: "Reminders", icon: "◉", disabled: true },
-  { label: "Reports", icon: "▥", disabled: true },
-  { label: "Settings", icon: "⚙", disabled: true },
+  { id: "dashboard", label: "Dashboard", icon: "⌂" },
+  { id: "vehicles", label: "Vehicles", icon: "▣" },
+  { id: "service-history", label: "Service History", icon: "⚒" },
+  { id: "fuel-log", label: "Fuel Log", icon: "⛽", disabled: true },
+  { id: "expenses", label: "Expenses", icon: "$", disabled: true },
+  { id: "reminders", label: "Reminders", icon: "◉", disabled: true },
+  { id: "reports", label: "Reports", icon: "▥", disabled: true },
+  { id: "settings", label: "Settings", icon: "⚙", disabled: true },
 ];
 
-export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
+export default function Sidebar({
+  collapsed,
+  onToggle,
+  activePage,
+  onNavigate,
+}: SidebarProps) {
   return (
     <aside
       className={[
@@ -90,48 +105,57 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
           " ",
         )}
       >
-        {navItems.map(({ label, icon, active, disabled }) => (
-          <button
-            key={label}
-            type="button"
-            disabled={disabled}
-            title={
-              collapsed
-                ? disabled
-                  ? `${label} — Coming in v2.0`
-                  : label
-                : disabled
-                  ? "Coming in v2.0"
-                  : undefined
-            }
-            className={[
-              "flex w-full items-center rounded-lg text-left text-sm font-medium transition-colors",
-              collapsed ? "justify-center px-2 py-3" : "gap-3 px-3 py-2.5",
-              active
-                ? "border-l-2 border-orange-500 bg-orange-500/10 text-orange-400"
-                : "",
-              !active && !disabled
-                ? "text-neutral-300 hover:bg-neutral-900 hover:text-white"
-                : "",
-              disabled ? "cursor-not-allowed text-neutral-600" : "",
-            ].join(" ")}
-          >
-            <span
-              aria-hidden="true"
-              className="flex w-5 shrink-0 justify-center text-base leading-none"
+        {navItems.map(({ id, label, icon, disabled }) => {
+          const active = id === activePage;
+
+          return (
+            <button
+              key={label}
+              type="button"
+              onClick={() => {
+                if (!disabled) {
+                  onNavigate(id as DashboardPage);
+                }
+              }}
+              disabled={disabled}
+              title={
+                collapsed
+                  ? disabled
+                    ? `${label} — Coming in v2.0`
+                    : label
+                  : disabled
+                    ? "Coming in v2.0"
+                    : undefined
+              }
+              className={[
+                "flex w-full items-center rounded-lg text-left text-sm font-medium transition-colors",
+                collapsed ? "justify-center px-2 py-3" : "gap-3 px-3 py-2.5",
+                active
+                  ? "border-l-2 border-orange-500 bg-orange-500/10 text-orange-400"
+                  : "",
+                !active && !disabled
+                  ? "text-neutral-300 hover:bg-neutral-900 hover:text-white"
+                  : "",
+                disabled ? "cursor-not-allowed text-neutral-600" : "",
+              ].join(" ")}
             >
-              {icon}
-            </span>
-
-            {!collapsed && <span className="truncate">{label}</span>}
-
-            {!collapsed && disabled && (
-              <span className="ml-auto rounded border border-neutral-800 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-neutral-600">
-                Soon
+              <span
+                aria-hidden="true"
+                className="flex w-5 shrink-0 justify-center text-base leading-none"
+              >
+                {icon}
               </span>
-            )}
-          </button>
-        ))}
+
+              {!collapsed && <span className="truncate">{label}</span>}
+
+              {!collapsed && disabled && (
+                <span className="ml-auto rounded border border-neutral-800 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-neutral-600">
+                  Soon
+                </span>
+              )}
+            </button>
+          );
+        })}
       </nav>
 
       <div

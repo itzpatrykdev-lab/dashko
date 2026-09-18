@@ -132,108 +132,161 @@ function App() {
 
   return (
     <DashboardLayout>
-      <DashboardHeader
-        vehicles={vehicles}
-        activeVehicleId={activeVehicleId}
-        vehiclesLoading={vehiclesLoading}
-        userEmail={userEmail}
-        userName={userName}
-        userInitial={userInitial}
-        onVehicleChange={setActiveVehicleId}
-        onAddVehicle={() => setShowAddVehicle(true)}
-        onLogService={() => setShowLogService(true)}
-        onLogout={handleLogout}
-      />
-      <main className="w-full px-6 py-6 lg:px-10 lg:py-7 xl:px-12">
-        <div className="flex flex-col gap-6 lg:gap-7">
-          {session ? (
-            <>
-              {vehiclesError && (
-                <section
-                  role="alert"
-                  className="flex flex-col gap-3 rounded-xl border border-danger/40 bg-danger/10 p-5 sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div>
-                    <p className="text-sm font-bold uppercase tracking-wide text-danger">
-                      Garage unavailable
-                    </p>
+      {(activePage) => (
+        <>
+          <DashboardHeader
+            vehicles={vehicles}
+            activeVehicleId={activeVehicleId}
+            vehiclesLoading={vehiclesLoading}
+            userEmail={userEmail}
+            userName={userName}
+            userInitial={userInitial}
+            onVehicleChange={setActiveVehicleId}
+            onAddVehicle={() => setShowAddVehicle(true)}
+            onLogService={() => setShowLogService(true)}
+            onLogout={handleLogout}
+          />
+          <main className="w-full px-6 py-6 lg:px-10 lg:py-7 xl:px-12">
+            <div className="flex flex-col gap-6 lg:gap-7">
+              {session ? (
+                <>
+                  {vehiclesError && (
+                    <section
+                      role="alert"
+                      className="flex flex-col gap-3 rounded-xl border border-danger/40 bg-danger/10 p-5 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div>
+                        <p className="text-sm font-bold uppercase tracking-wide text-danger">
+                          Garage unavailable
+                        </p>
 
-                    <p className="mt-1 text-sm text-text-muted">
-                      {vehiclesError}
-                    </p>
-                  </div>
+                        <p className="mt-1 text-sm text-text-muted">
+                          {vehiclesError}
+                        </p>
+                      </div>
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setRefreshTrigger((previous) => previous + 1)
-                    }
-                    className="inline-flex w-fit rounded-md border border-danger px-3 py-2 text-sm font-bold text-danger transition hover:bg-danger hover:text-white"
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setRefreshTrigger((previous) => previous + 1)
+                        }
+                        className="inline-flex w-fit rounded-md border border-danger px-3 py-2 text-sm font-bold text-danger transition hover:bg-danger hover:text-white"
+                      >
+                        Try again
+                      </button>
+                    </section>
+                  )}
+                  {activePage === "dashboard" && (
+                    <>
+                      {vehiclesLoading ? (
+                        <section
+                          aria-live="polite"
+                          aria-busy="true"
+                          className="rounded-xl border border-border bg-background px-6 py-12 text-center"
+                        >
+                          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
+                            Loading garage
+                          </p>
+
+                          <p className="mt-2 text-sm text-text-muted">
+                            Getting your vehicles ready.
+                          </p>
+                        </section>
+                      ) : activeVehicle ? (
+                        <GarageDashboard
+                          vehicle={activeVehicle}
+                          refreshTrigger={refreshTrigger}
+                        />
+                      ) : !vehiclesError ? (
+                        <EmptyGarageState
+                          onAddVehicle={() => setShowAddVehicle(true)}
+                        />
+                      ) : null}
+                    </>
+                  )}
+
+                  {activePage === "vehicles" && (
+                    <section className="space-y-6">
+                      <div className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between">
+                        <div>
+                          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
+                            Garage
+                          </p>
+
+                          <h1 className="mt-2 text-2xl font-bold tracking-tight text-text-primary">
+                            Your Vehicles
+                          </h1>
+
+                          <p className="mt-1 text-sm text-text-muted">
+                            Manage the vehicles in your garage.
+                          </p>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setShowAddVehicle(true)}
+                          className="inline-flex w-fit items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-bold text-white transition hover:bg-accent/90"
+                        >
+                          Add vehicle
+                        </button>
+                      </div>
+
+                      <VehicleList
+                        vehicles={vehicles}
+                        loading={vehiclesLoading}
+                        onVehicleChanged={handleVehicleChanged}
+                        refreshTrigger={refreshTrigger}
+                      />
+                    </section>
+                  )}
+
+                  {activePage === "service-history" && (
+                    <section className="rounded-xl border border-border bg-background px-6 py-12 text-center">
+                      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
+                        Service History
+                      </p>
+
+                      <h1 className="mt-3 text-xl font-bold text-text-primary">
+                        Service history is next
+                      </h1>
+
+                      <p className="mx-auto mt-2 max-w-md text-sm text-text-muted">
+                        Your logged maintenance records will live here in a
+                        dedicated view.
+                      </p>
+                    </section>
+                  )}
+
+                  <Modal
+                    isOpen={showAddVehicle}
+                    onClose={() => setShowAddVehicle(false)}
+                    title="Add a Vehicle"
                   >
-                    Try again
-                  </button>
-                </section>
+                    <AddVehicle
+                      session={session}
+                      onVehicleAdded={handleVehicleAdded}
+                    />
+                  </Modal>
+
+                  <Modal
+                    isOpen={showLogService}
+                    onClose={() => setShowLogService(false)}
+                    title="Log a Service"
+                  >
+                    <AddServiceRecord
+                      session={session}
+                      vehicles={vehicles}
+                      onRecordAdded={handleServiceRecordAdded}
+                    />
+                  </Modal>
+                </>
+              ) : (
+                <Auth />
               )}
-              {vehiclesLoading ? (
-                <section
-                  aria-live="polite"
-                  aria-busy="true"
-                  className="rounded-xl border border-border bg-background px-6 py-12 text-center"
-                >
-                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
-                    Loading garage
-                  </p>
-
-                  <p className="mt-2 text-sm text-text-muted">
-                    Getting your vehicles ready.
-                  </p>
-                </section>
-              ) : activeVehicle ? (
-                <GarageDashboard
-                  vehicle={activeVehicle}
-                  refreshTrigger={refreshTrigger}
-                />
-              ) : !vehiclesError ? (
-                <EmptyGarageState
-                  onAddVehicle={() => setShowAddVehicle(true)}
-                />
-              ) : null}
-
-              <VehicleList
-                vehicles={vehicles}
-                loading={vehiclesLoading}
-                onVehicleChanged={handleVehicleChanged}
-                refreshTrigger={refreshTrigger}
-              />
-
-              <Modal
-                isOpen={showAddVehicle}
-                onClose={() => setShowAddVehicle(false)}
-                title="Add a Vehicle"
-              >
-                <AddVehicle
-                  session={session}
-                  onVehicleAdded={handleVehicleAdded}
-                />
-              </Modal>
-
-              <Modal
-                isOpen={showLogService}
-                onClose={() => setShowLogService(false)}
-                title="Log a Service"
-              >
-                <AddServiceRecord
-                  session={session}
-                  vehicles={vehicles}
-                  onRecordAdded={handleServiceRecordAdded}
-                />
-              </Modal>
-            </>
-          ) : (
-            <Auth />
-          )}
-        </div>
-      </main>
+            </div>
+          </main>
+        </>
+      )}
     </DashboardLayout>
   );
 }
