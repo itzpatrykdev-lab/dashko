@@ -9,6 +9,7 @@ import DashboardLayout from "./DashboardLayout";
 import EmptyGarageState from "./features/garage/components/EmptyGarageState";
 import GarageDashboard from "./features/garage/components/GarageDashboard";
 import Modal from "./components/ui/Modal";
+import ServiceHistoryPage from "./features/garage/components/ServiceHistoryPage";
 import VehicleList from "./features/garage/components/VehicleList";
 import type { Vehicle } from "./types/vehicle";
 
@@ -214,22 +215,12 @@ function App() {
                       activeVehicleId={activeVehicleId}
                     />
                   )}
-
-                  {activePage === "service-history" && (
-                    <section className="rounded-xl border border-border bg-background px-6 py-12 text-center">
-                      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
-                        Service History
-                      </p>
-
-                      <h1 className="mt-3 text-xl font-bold text-text-primary">
-                        Service history is next
-                      </h1>
-
-                      <p className="mx-auto mt-2 max-w-md text-sm text-text-muted">
-                        Your logged maintenance records will live here in a
-                        dedicated view.
-                      </p>
-                    </section>
+                  {activePage === "service-history" && session && (
+                    <ServiceHistoryPage
+                      userId={session.user.id}
+                      vehicles={vehicles}
+                      refreshTrigger={refreshTrigger}
+                    />
                   )}
 
                   <Modal
