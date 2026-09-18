@@ -206,38 +206,12 @@ function App() {
                   )}
 
                   {activePage === "vehicles" && (
-                    <section className="space-y-6">
-                      <div className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between">
-                        <div>
-                          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
-                            Garage
-                          </p>
-
-                          <h1 className="mt-2 text-2xl font-bold tracking-tight text-text-primary">
-                            Your Vehicles
-                          </h1>
-
-                          <p className="mt-1 text-sm text-text-muted">
-                            Manage the vehicles in your garage.
-                          </p>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => setShowAddVehicle(true)}
-                          className="inline-flex w-fit items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-bold text-white transition hover:bg-accent/90"
-                        >
-                          Add vehicle
-                        </button>
-                      </div>
-
-                      <VehicleList
-                        vehicles={vehicles}
-                        loading={vehiclesLoading}
-                        onVehicleChanged={handleVehicleChanged}
-                        refreshTrigger={refreshTrigger}
-                      />
-                    </section>
+                    <VehicleList
+                      vehicles={vehicles}
+                      loading={vehiclesLoading}
+                      onVehicleChanged={handleVehicleChanged}
+                      onAddVehicle={() => setShowAddVehicle(true)}
+                    />
                   )}
 
                   {activePage === "service-history" && (
